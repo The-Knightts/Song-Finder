@@ -1,70 +1,77 @@
-# Getting Started with Create React App
+# Music Explorer App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A React application that allows users to search for music tracks using the Spotify Web API.
 
-## Available Scripts
+## Setup Instructions
 
-In the project directory, you can run:
+### 1. Get Spotify API Credentials
 
-### `npm start`
+To fix the 401 authentication error, you need to obtain Spotify API credentials:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+1. Go to [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
+2. Log in with your Spotify account (or create one if needed)
+3. Click "Create an App"
+4. Fill in the app details:
+   - App name: "Music Explorer" (or any name you prefer)
+   - App description: "A music search application"
+   - Check the boxes for agreement
+5. Click "Create"
+6. On your app dashboard, click "Settings"
+7. Copy your "Client ID" and "Client Secret"
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### 2. Configure Environment Variables
 
-### `npm test`
+1. Open the `.env` file in your project root
+2. Replace the placeholder values with your actual credentials:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```
+REACT_APP_SPOTIFY_CLIENT_ID=your_actual_client_id_here
+REACT_APP_SPOTIFY_CLIENT_SECRET=your_actual_client_secret_here
+```
 
-### `npm run build`
+### 3. Restart the Development Server
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+After adding your credentials, restart the development server:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```bash
+# Stop the current server (Ctrl+C)
+npm start
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Features
 
-### `npm run eject`
+- Search for music tracks using the Spotify API
+- View track details including album artwork
+- Play 30-second previews (when available)
+- Responsive design with modern UI
+- Proper error handling and loading states
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## How It Works
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+The application now uses the Spotify Web API with proper authentication:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+1. **Authentication**: Uses Client Credentials flow to obtain an access token
+2. **Search**: Searches for tracks using the Spotify Search API
+3. **Error Handling**: Gracefully handles authentication errors and token expiration
+4. **UI States**: Shows loading indicators and error messages
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Troubleshooting
 
-## Learn More
+### 401 Authentication Error
+If you still see a 401 error:
+- Double-check your Client ID and Client Secret are correct
+- Ensure there are no extra spaces in your `.env` file
+- Restart the development server after making changes
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### Other Issues
+- Make sure you have a stable internet connection
+- Check that the Spotify API is accessible
+- Verify your Spotify app is properly configured
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Technical Details
 
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- **Frontend**: React with hooks (useState, useEffect)
+- **API**: Spotify Web API
+- **Authentication**: Client Credentials flow
+- **HTTP Client**: Axios
+- **Styling**: CSS with modern design patterns

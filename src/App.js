@@ -1,43 +1,100 @@
 
-import React, { useState } from "react";
-import { searchTracks } from "./api";
+import React, { useState, useEffect } from "react";
+import { searchTracks, getAccessToken } from "./api";
 import "./App.css"; // add styles
 
 function App() {
   const [query, setQuery] = useState("");
   const [tracks, setTracks] = useState([]);
-  const [token, setToken] = useState("BQC3OmJvaEJmkmlMHSAI36VEB_N7iCBk4WXR1h5x5ZeJwRaHEZYYnU59MQOPLZ9MCNljlGkKU1rlg7FXTXI9fM6mYqFfEQqCMdbmaCTQetYRQHWfwk6nFFG3NG-fw5ovki0D3T2_riZIORwngVgXyWBoEEc8bTO5uOo9z_ptlY7srdmZFuslbeUKNXdwAKZ1zvjm4AuoTn8obvQs-cJZZe6TKfX2hlEGE0OowQFygZ-_iHsLqcCAVXj35rXCFX_mJYsyOU5S8oaTIIJqcUqPeLBDMjCKqgm-u77_aWG9T3H1BDNJgBIx7XujI7MTjjqEdGZM"); 
+  const [token, setToken] = useState(null);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // Get access token on component mount
+    const fetchToken = async () => {
+      try {
+        console.log('Fetching access token...');
+        const accessToken = await getAccessToken();
+        console.log('Access token obtained successfully');
+        setToken(accessToken);
+        setError("");
+      } catch (err) {
+        console.error('Failed to get access token:', err);
+        setError(err.message);
+      }
+    };
+    fetchToken();
+  }, []);
+
+
 
   const handleSearch = async () => {
     if (!query || !token) return;
-    const results = await searchTracks(query, token);
-    setTracks(results);
+    
+    setLoading(true);
+    setError("");
+    
+    try {
+      const results = await searchTracks(query, token);
+      setTracks(results);
+    } catch (err) {
+      setError(err.message);
+      if (err.message.includes("Authentication failed")) {
+        // Try to refresh token
+        try {
+          const newToken = await getAccessToken();
+          setToken(newToken);
+          const results = await searchTracks(query, newToken);
+          setTracks(results);
+        } catch (refreshErr) {
+          setError(refreshErr.message);
+        }
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="app">
       <h1 className="title">🎵 Music Explorer</h1>
 
+      {error && (
+        <div className="error-message">
+          <p>{error}</p>
+        </div>
+      )}
+
       <div className="search-bar">
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
+          onKeyPress={(e) => {
+            if (e.key === 'Enter' && query && token && !loading) {
+              handleSearch();
+            }
+          }}
           placeholder="Search for songs..."
+          disabled={!token || loading}
         />
-        <button onClick={handleSearch}>Search</button>
+        <button onClick={handleSearch} disabled={!query || !token || loading}>
+          {loading ? "Searching..." : "Search"}
+        </button>
       </div>
+
+      {!token && !error && (
+        <div className="loading-message">
+          <p>Connecting to Spotify...</p>
+        </div>
+      )}
 
       <div className="track-grid">
         {tracks.map((track) => (
           <div key={track.id} className="track-card">
             <img src={track.album.images[0]?.url} alt={track.name} />
-            <h2>{track.name}</h2>
-            <p>{track.artists.map((a) => a.name).join(", ")}</p>
-            {track.preview_url ? (
-              <audio controls src={track.preview_url}></audio>
-            ) : (
-              <p className="no-preview">No Preview</p>
-            )}
+            <div className="track-name">{track.name}</div>
+            <div className="artist-name">{track.artists.map(artist => artist.name).join(", ")}</div>
           </div>
         ))}
       </div>
